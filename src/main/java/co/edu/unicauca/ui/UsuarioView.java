@@ -1,13 +1,9 @@
 package co.edu.unicauca.ui;
-// s interfaz
-//D inversion
-import co.edu.unicauca.model.Paciente;
+
 import co.edu.unicauca.model.Usuario;
-import co.edu.unicauca.repository.PacienteRepositoryImpl;
 import co.edu.unicauca.service.IAuthService;
 import co.edu.unicauca.service.IPacienteService;
 import co.edu.unicauca.service.IUsuarioService;
-import co.edu.unicauca.service.PacienteServiceImpl;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -23,23 +19,24 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-public class PacienteView {
+public class UsuarioView {
 
     private final Usuario usuarioActivo;
     private final IAuthService authService;
-    private final Stage stage;
     private final IPacienteService pacienteService;
     private final IUsuarioService usuarioService;
-    private TableView<Paciente> tabla;
-    private ObservableList<Paciente> datos;
+    private final Stage stage;
+    private TableView<Usuario> tabla;
+    private ObservableList<Usuario> datos;
 
-   public PacienteView(Usuario usuarioActivo, IAuthService authService, Stage stage, IPacienteService pacienteService, IUsuarioService usuarioService) {
-    this.usuarioActivo = usuarioActivo;
-    this.authService = authService;
-    this.stage = stage;
-    this.pacienteService = pacienteService; // Inyectado, no instanciado
-    this.usuarioService = usuarioService; // Inyectado, no instanciado
-}
+    public UsuarioView(Usuario usuarioActivo, IAuthService authService, IPacienteService pacienteService, 
+                       IUsuarioService usuarioService, Stage stage) {
+        this.usuarioActivo = usuarioActivo;
+        this.authService = authService;
+        this.pacienteService = pacienteService;
+        this.usuarioService = usuarioService;
+        this.stage = stage;
+    }
 
     public void mostrar() {
         BorderPane root = new BorderPane();
@@ -48,8 +45,8 @@ public class PacienteView {
         root.setTop(crearHeader());
         root.setCenter(crearCuerpo());
 
-        Scene scene = new Scene(root, 1000, 650);
-        stage.setTitle("Sistema Clínica — Pacientes");
+        Scene scene = new Scene(root, 1000, 600);
+        stage.setTitle("Sistema Clínica — Gestión de Usuarios");
         stage.setScene(scene);
         stage.setResizable(true);
         stage.show();
@@ -68,51 +65,33 @@ public class PacienteView {
             "-fx-border-width: 0 0 1 0;"
         );
 
-        Text icono = new Text("🏥");
+        Text icono = new Text("📋");
         icono.setFont(Font.font(22));
 
-        Text titulo = new Text("Sistema Clínica");
+        Text titulo = new Text("Gestión de Usuarios");
         titulo.setFont(Font.font("Georgia", FontWeight.BOLD, 20));
         titulo.setFill(Color.web("#e6edf3"));
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Botón para gestionar usuarios (solo ADMIN)
-        HBox adminTools = new HBox(8);
-        if (usuarioActivo.esAdmin()) {
-            Button btnGestionarUsuarios = new Button("👥 Gestionar Usuarios");
-            btnGestionarUsuarios.setStyle(
-                "-fx-background-color: #1f6feb;" +
-                "-fx-text-fill: white;" +
-                "-fx-border-color: #388bfd;" +
-                "-fx-border-radius: 6;" +
-                "-fx-background-radius: 6;" +
-                "-fx-cursor: hand;" +
-                "-fx-font-size: 12px;" +
-                "-fx-padding: 5 12 5 12;"
-            );
-            btnGestionarUsuarios.setOnAction(e -> new UsuarioView(usuarioActivo, authService, pacienteService, usuarioService, stage).mostrar());
-            adminTools.getChildren().add(btnGestionarUsuarios);
-        }
-
         Label lblUsuario = new Label("👤 " + usuarioActivo.getUsername() + "  [" + usuarioActivo.getRol() + "]");
         lblUsuario.setStyle("-fx-text-fill: #8b949e; -fx-font-size: 13px;");
 
-        Button btnSalir = new Button("Cerrar sesión");
-        btnSalir.setStyle(
+        Button btnVolver = new Button("← Volver");
+        btnVolver.setStyle(
             "-fx-background-color: transparent;" +
-            "-fx-text-fill: #f85149;" +
-            "-fx-border-color: #f85149;" +
+            "-fx-text-fill: #58a6ff;" +
+            "-fx-border-color: #58a6ff;" +
             "-fx-border-radius: 6;" +
             "-fx-background-radius: 6;" +
             "-fx-cursor: hand;" +
             "-fx-font-size: 12px;" +
             "-fx-padding: 5 12 5 12;"
         );
-        btnSalir.setOnAction(e -> new LoginView(authService, pacienteService, usuarioService, stage).mostrar());
+        btnVolver.setOnAction(e -> new PacienteView(usuarioActivo, authService, stage, pacienteService, usuarioService).mostrar());
 
-        header.getChildren().addAll(icono, titulo, spacer, adminTools, lblUsuario, btnSalir);
+        header.getChildren().addAll(icono, titulo, spacer, lblUsuario, btnVolver);
         return header;
     }
 
@@ -130,39 +109,26 @@ public class PacienteView {
         HBox barra = new HBox(10);
         barra.setAlignment(Pos.CENTER_LEFT);
 
-        Text tituloSeccion = new Text("Lista de Pacientes");
+        Text tituloSeccion = new Text("Lista de Usuarios");
         tituloSeccion.setFont(Font.font("Georgia", FontWeight.BOLD, 16));
         tituloSeccion.setFill(Color.web("#e6edf3"));
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Button btnNuevo = crearBoton("＋ Nuevo Paciente", "#238636", "#2ea043");
-        Button btnEditar = crearBoton("✏ Editar", "#1f6feb", "#388bfd");
+        Button btnNuevo = crearBoton("+ Nuevo Usuario", "#238636", "#2ea043");
         Button btnEliminar = crearBoton("🗑 Eliminar", "#b62324", "#da3633");
 
-        // Solo ADMIN puede crear y eliminar
-        btnNuevo.setDisable(!usuarioActivo.esAdmin());
-        btnEliminar.setDisable(!usuarioActivo.esAdmin());
+        btnNuevo.setOnAction(e -> abrirFormularioNuevoUsuario());
+        btnEliminar.setOnAction(e -> eliminarUsuario());
 
-        btnNuevo.setOnAction(e -> abrirFormulario(null));
-        btnEditar.setOnAction(e -> {
-            Paciente seleccionado = tabla.getSelectionModel().getSelectedItem();
-            if (seleccionado != null) {
-                abrirFormulario(seleccionado);
-            } else {
-                mostrarAlerta("Selecciona un paciente para editar.", Alert.AlertType.WARNING);
-            }
-        });
-        btnEliminar.setOnAction(e -> eliminarPaciente());
-
-        barra.getChildren().addAll(tituloSeccion, spacer, btnNuevo, btnEditar, btnEliminar);
+        barra.getChildren().addAll(tituloSeccion, spacer, btnNuevo, btnEliminar);
         return barra;
     }
 
     // ── Tabla ─────────────────────────────────────────────────────────────────
     @SuppressWarnings("unchecked")
-    private TableView<Paciente> crearTabla() {
+    private TableView<Usuario> crearTabla() {
         tabla = new TableView<>();
         tabla.setStyle(
             "-fx-background-color: #161b22;" +
@@ -174,17 +140,11 @@ public class PacienteView {
         tabla.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         VBox.setVgrow(tabla, Priority.ALWAYS);
 
-        TableColumn<Paciente, Integer> colId = crearColumna("ID", "id", 50);
-        TableColumn<Paciente, String> colNombre = crearColumna("Nombre", "nombre", 120);
-        TableColumn<Paciente, String> colApellido = crearColumna("Apellido", "apellido", 120);
-        TableColumn<Paciente, String> colCedula = crearColumna("Cédula", "cedula", 110);
-        TableColumn<Paciente, String> colTelefono = crearColumna("Teléfono", "telefono", 110);
-        TableColumn<Paciente, String> colCorreo = crearColumna("Correo", "correo", 160);
-        TableColumn<Paciente, String> colFecha = crearColumna("Fecha Nac.", "fechaNacimiento", 100);
-        TableColumn<Paciente, String> colDiag = crearColumna("Diagnóstico", "diagnostico", 180);
+        TableColumn<Usuario, Integer> colId = crearColumna("ID", "id", 50);
+        TableColumn<Usuario, String> colUsername = crearColumna("Usuario", "username", 150);
+        TableColumn<Usuario, String> colRol = crearColumna("Rol", "rol", 100);
 
-        tabla.getColumns().addAll(colId, colNombre, colApellido, colCedula,
-                                   colTelefono, colCorreo, colFecha, colDiag);
+        tabla.getColumns().addAll(colId, colUsername, colRol);
 
         datos = FXCollections.observableArrayList();
         tabla.setItems(datos);
@@ -197,36 +157,84 @@ public class PacienteView {
         return tabla;
     }
 
-    private <T> TableColumn<Paciente, T> crearColumna(String titulo, String propiedad, int ancho) {
-        TableColumn<Paciente, T> col = new TableColumn<>(titulo);
+    private <T> TableColumn<Usuario, T> crearColumna(String titulo, String propiedad, int ancho) {
+        TableColumn<Usuario, T> col = new TableColumn<>(titulo);
         col.setCellValueFactory(new PropertyValueFactory<>(propiedad));
         col.setPrefWidth(ancho);
         col.setStyle("-fx-alignment: CENTER-LEFT;");
         return col;
     }
 
-    // ── Formulario nuevo/editar ───────────────────────────────────────────────
-    private void abrirFormulario(Paciente paciente) {
-        new PacienteFormView(paciente, usuarioActivo, pacienteService, this::cargarDatos).mostrar();
+    // ── Formulario nuevo usuario ──────────────────────────────────────────────
+    private void abrirFormularioNuevoUsuario() {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Crear Nuevo Usuario");
+        dialog.setHeaderText("Registrar un nuevo usuario del sistema");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20));
+
+        TextField txtUsername = new TextField();
+        txtUsername.setPromptText("Nombre de usuario");
+        
+        PasswordField txtPassword = new PasswordField();
+        txtPassword.setPromptText("Contraseña (mín. 6 caracteres)");
+        
+        ComboBox<Usuario.Rol> cmbRol = new ComboBox<>();
+        cmbRol.setItems(FXCollections.observableArrayList(Usuario.Rol.values()));
+        cmbRol.setValue(Usuario.Rol.USER);
+
+        grid.add(new Label("Usuario:"), 0, 0);
+        grid.add(txtUsername, 1, 0);
+        grid.add(new Label("Contraseña:"), 0, 1);
+        grid.add(txtPassword, 1, 1);
+        grid.add(new Label("Rol:"), 0, 2);
+        grid.add(cmbRol, 1, 2);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.showAndWait().ifPresent(resp -> {
+            if (resp == ButtonType.OK) {
+                try {
+                    String username = txtUsername.getText().trim();
+                    String password = txtPassword.getText();
+                    Usuario.Rol rol = cmbRol.getValue();
+
+                    usuarioService.crear(username, password, rol, usuarioActivo);
+                    cargarDatos();
+                    mostrarAlerta("Usuario creado exitosamente.", Alert.AlertType.INFORMATION);
+                } catch (Exception ex) {
+                    mostrarAlerta("Error: " + ex.getMessage(), Alert.AlertType.ERROR);
+                }
+            }
+        });
     }
 
-    // ── Eliminar ──────────────────────────────────────────────────────────────
-    private void eliminarPaciente() {
-        Paciente seleccionado = tabla.getSelectionModel().getSelectedItem();
+    // ── Eliminar usuario ──────────────────────────────────────────────────────
+    private void eliminarUsuario() {
+        Usuario seleccionado = tabla.getSelectionModel().getSelectedItem();
         if (seleccionado == null) {
-            mostrarAlerta("Selecciona un paciente para eliminar.", Alert.AlertType.WARNING);
+            mostrarAlerta("Selecciona un usuario para eliminar.", Alert.AlertType.WARNING);
             return;
         }
+        if (seleccionado.getId() == usuarioActivo.getId()) {
+            mostrarAlerta("No puedes eliminar tu propia cuenta.", Alert.AlertType.WARNING);
+            return;
+        }
+
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmar eliminación");
-        confirm.setHeaderText("¿Eliminar a " + seleccionado.getNombre() + " " + seleccionado.getApellido() + "?");
+        confirm.setHeaderText("¿Eliminar a " + seleccionado.getUsername() + "?");
         confirm.setContentText("Esta acción no se puede deshacer.");
         confirm.showAndWait().ifPresent(resp -> {
             if (resp == ButtonType.OK) {
                 try {
-                    pacienteService.eliminar(seleccionado.getId(), usuarioActivo);
+                    usuarioService.eliminar(seleccionado.getId(), usuarioActivo);
                     cargarDatos();
-                    mostrarAlerta("Paciente eliminado correctamente.", Alert.AlertType.INFORMATION);
+                    mostrarAlerta("Usuario eliminado correctamente.", Alert.AlertType.INFORMATION);
                 } catch (Exception ex) {
                     mostrarAlerta("Error: " + ex.getMessage(), Alert.AlertType.ERROR);
                 }
@@ -236,7 +244,7 @@ public class PacienteView {
 
     // ── Cargar datos ──────────────────────────────────────────────────────────
     public void cargarDatos() {
-        datos.setAll(pacienteService.listarTodos());
+        datos.setAll(usuarioService.listarTodos());
     }
 
     // ── Utilidades ────────────────────────────────────────────────────────────

@@ -175,5 +175,15 @@ public class AuthServiceImplTest {
         public boolean existeUsername(String username) {
             return data.containsKey(username);
         }
+
+        @Override
+        public java.util.List<Usuario> obtenerTodos() {
+            return new java.util.ArrayList<>(data.values());
+        }
+
+        @Override
+        public void eliminar(int id) {
+            // Fake implementation for testing
+        }
     }
 }

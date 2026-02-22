@@ -2,6 +2,8 @@ package co.edu.unicauca.ui;
 
 import co.edu.unicauca.model.Usuario;
 import co.edu.unicauca.service.IAuthService;
+import co.edu.unicauca.service.IPacienteService;
+import co.edu.unicauca.service.IUsuarioService;
 import java.util.Optional;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -19,10 +21,14 @@ import javafx.stage.Stage;
 public class LoginView {
 
     private final IAuthService authService;
+    private final IPacienteService pacienteService;
+    private final IUsuarioService usuarioService;
     private final Stage stage;
 
-    public LoginView(IAuthService authService, Stage stage) {
+    public LoginView(IAuthService authService, IPacienteService pacienteService, IUsuarioService usuarioService, Stage stage) {
         this.authService = authService;
+        this.pacienteService = pacienteService;
+        this.usuarioService = usuarioService;
         this.stage = stage;
     }
 
@@ -110,7 +116,7 @@ public class LoginView {
             String pass = txtPassword.getText();
             Optional<Usuario> resultado = authService.login(user, pass);
             if (resultado.isPresent()) {
-                new PacienteView(resultado.get(), authService, stage).mostrar();
+                new PacienteView(resultado.get(), authService, stage, pacienteService, usuarioService).mostrar();
             } else {
                 lblError.setText("❌ Usuario o contraseña incorrectos");
                 lblError.setVisible(true);

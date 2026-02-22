@@ -1,3 +1,4 @@
+co\edu\unicauca\ui\UsuarioView.class
 co\edu\unicauca\database\DatabaseInitializer.class
 co\edu\unicauca\service\AuthServiceImpl.class
 co\edu\unicauca\repository\IUsuarioRepository.class
@@ -5,7 +6,9 @@ co\edu\unicauca\ui\LoginView.class
 co\edu\unicauca\util\PasswordUtil.class
 co\edu\unicauca\model\Usuario$Rol.class
 co\edu\unicauca\database\DatabaseConnection.class
+co\edu\unicauca\service\IUsuarioService.class
 co\edu\unicauca\model\Usuario.class
+co\edu\unicauca\service\UsuarioServiceImpl.class
 co\edu\unicauca\repository\IPacienteRepository.class
 co\edu\unicauca\SistemaClinica.class
 co\edu\unicauca\repository\PacienteRepositoryImpl.class

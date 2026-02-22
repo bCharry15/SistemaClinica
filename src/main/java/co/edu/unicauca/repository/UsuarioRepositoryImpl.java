@@ -11,6 +11,8 @@ package co.edu.unicauca.repository;
 import co.edu.unicauca.database.DatabaseConnection;
 import co.edu.unicauca.model.Usuario;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class UsuarioRepositoryImpl implements IUsuarioRepository {
@@ -62,6 +64,38 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
             return rs.next() && rs.getInt(1) > 0;
         } catch (SQLException e) {
             throw new RuntimeException("Error al verificar usuario", e);
+        }
+    }
+
+    @Override
+    public List<Usuario> obtenerTodos() {
+        List<Usuario> usuarios = new ArrayList<>();
+        String sql = "SELECT * FROM usuarios";
+        try (Statement stmt = getConn().createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Usuario u = new Usuario(
+                    rs.getInt("id"),
+                    rs.getString("username"),
+                    rs.getString("password_hash"),
+                    Usuario.Rol.valueOf(rs.getString("rol"))
+                );
+                usuarios.add(u);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al obtener usuarios: " + e.getMessage(), e);
+        }
+        return usuarios;
+    }
+
+    @Override
+    public void eliminar(int id) {
+        String sql = "DELETE FROM usuarios WHERE id=?";
+        try (PreparedStatement ps = getConn().prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al eliminar usuario: " + e.getMessage(), e);
         }
     }
 }

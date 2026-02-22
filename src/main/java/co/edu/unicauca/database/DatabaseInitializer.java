@@ -8,6 +8,9 @@ package co.edu.unicauca.database;
  *
  * @author jpuen
  */
+import co.edu.unicauca.model.Paciente;
+import co.edu.unicauca.model.Usuario;
+import co.edu.unicauca.service.IPacienteService;
 import co.edu.unicauca.util.PasswordUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -16,9 +19,11 @@ import java.sql.Statement;
 public class DatabaseInitializer {
 
     private final Connection connection;
+    private final IPacienteService pacienteService;
 
-    public DatabaseInitializer(Connection connection) {
+    public DatabaseInitializer(Connection connection, IPacienteService pacienteService) {
         this.connection = connection;
+        this.pacienteService = pacienteService;
     }
 
     public void inicializar() throws SQLException {
@@ -92,18 +97,17 @@ public class DatabaseInitializer {
         try (Statement stmt = connection.createStatement();
              java.sql.ResultSet rs = stmt.executeQuery(checkSql)) {
             if (rs.next() && rs.getInt(1) == 0) {
-                String[] inserts = {
-                    "INSERT INTO pacientes (nombre, apellido, cedula, telefono, correo, fecha_nacimiento, diagnostico) "
-                    + "VALUES ('María', 'García', '1001234567', '3101234567', 'maria@gmail.com', '1985-03-12', 'Hipertensión arterial')",
-                    "INSERT INTO pacientes (nombre, apellido, cedula, telefono, correo, fecha_nacimiento, diagnostico) "
-                    + "VALUES ('Carlos', 'Rodríguez', '1009876543', '3209876543', 'carlos@gmail.com', '1990-07-25', 'Diabetes tipo 2')",
-                    "INSERT INTO pacientes (nombre, apellido, cedula, telefono, correo, fecha_nacimiento, diagnostico) "
-                    + "VALUES ('Laura', 'Martínez', '1005551234', '3005551234', 'laura@gmail.com', '2000-11-08', 'Asma bronquial')"
+                // Usar usuario admin para las operaciones
+                Usuario usuarioAdmin = new Usuario(1, "admin", "admin123", Usuario.Rol.ADMIN);
+                
+                Paciente[] pacientes = {
+                    new Paciente(0, "María", "García", "1001234567", "3101234567", "maria@gmail.com", "1985-03-12", "Hipertensión arterial"),
+                    new Paciente(0, "Carlos", "Rodríguez", "1009876543", "3209876543", "carlos@gmail.com", "1990-07-25", "Diabetes tipo 2"),
+                    new Paciente(0, "Laura", "Martínez", "1005551234", "3005551234", "laura@gmail.com", "2000-11-08", "Asma bronquial")
                 };
-                for (String sql : inserts) {
-                    try (Statement s2 = connection.createStatement()) {
-                        s2.execute(sql);
-                    }
+                
+                for (Paciente paciente : pacientes) {
+                    pacienteService.registrar(paciente, usuarioAdmin);
                 }
             }
         }
