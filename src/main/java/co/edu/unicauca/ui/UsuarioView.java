@@ -117,12 +117,16 @@ public class UsuarioView {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         Button btnNuevo = crearBoton("+ Nuevo Usuario", "#238636", "#2ea043");
+        Button btnActivar = crearBoton("✓ Activar", "#238636", "#2ea043");
+        Button btnDesactivar = crearBoton("✗ Desactivar", "#da3633", "#f85149");
         Button btnEliminar = crearBoton("🗑 Eliminar", "#b62324", "#da3633");
 
         btnNuevo.setOnAction(e -> abrirFormularioNuevoUsuario());
+        btnActivar.setOnAction(e -> activarUsuario());
+        btnDesactivar.setOnAction(e -> desactivarUsuario());
         btnEliminar.setOnAction(e -> eliminarUsuario());
 
-        barra.getChildren().addAll(tituloSeccion, spacer, btnNuevo, btnEliminar);
+        barra.getChildren().addAll(tituloSeccion, spacer, btnNuevo, btnActivar, btnDesactivar, btnEliminar);
         return barra;
     }
 
@@ -143,8 +147,9 @@ public class UsuarioView {
         TableColumn<Usuario, Integer> colId = crearColumna("ID", "id", 50);
         TableColumn<Usuario, String> colUsername = crearColumna("Usuario", "username", 150);
         TableColumn<Usuario, String> colRol = crearColumna("Rol", "rol", 100);
+        TableColumn<Usuario, String> colEstado = crearColumna("Estado", "estado", 100);
 
-        tabla.getColumns().addAll(colId, colUsername, colRol);
+        tabla.getColumns().addAll(colId, colUsername, colRol, colEstado);
 
         datos = FXCollections.observableArrayList();
         tabla.setItems(datos);
@@ -235,6 +240,72 @@ public class UsuarioView {
                     usuarioService.eliminar(seleccionado.getId(), usuarioActivo);
                     cargarDatos();
                     mostrarAlerta("Usuario eliminado correctamente.", Alert.AlertType.INFORMATION);
+                } catch (Exception ex) {
+                    mostrarAlerta("Error: " + ex.getMessage(), Alert.AlertType.ERROR);
+                }
+            }
+        });
+    }
+
+    // ── Desactivar usuario ───────────────────────────────────────────────────
+    private void desactivarUsuario() {
+        Usuario seleccionado = tabla.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            mostrarAlerta("Selecciona un usuario para desactivar.", Alert.AlertType.WARNING);
+            return;
+        }
+        if (seleccionado.getId() == usuarioActivo.getId()) {
+            mostrarAlerta("No puedes desactivar tu propia cuenta.", Alert.AlertType.WARNING);
+            return;
+        }
+        if (seleccionado.getEstado() == Usuario.Estado.DESACTIVADO) {
+            mostrarAlerta("El usuario ya está desactivado.", Alert.AlertType.WARNING);
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmar desactivación");
+        confirm.setHeaderText("¿Desactivar a " + seleccionado.getUsername() + "?");
+        confirm.setContentText("El usuario no podrá acceder al sistema.");
+        confirm.showAndWait().ifPresent(resp -> {
+            if (resp == ButtonType.OK) {
+                try {
+                    usuarioService.cambiarEstado(seleccionado.getId(), Usuario.Estado.DESACTIVADO, usuarioActivo);
+                    cargarDatos();
+                    mostrarAlerta("Usuario desactivado correctamente.", Alert.AlertType.INFORMATION);
+                } catch (Exception ex) {
+                    mostrarAlerta("Error: " + ex.getMessage(), Alert.AlertType.ERROR);
+                }
+            }
+        });
+    }
+
+    // ── Activar usuario ──────────────────────────────────────────────────────
+    private void activarUsuario() {
+        Usuario seleccionado = tabla.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            mostrarAlerta("Selecciona un usuario para activar.", Alert.AlertType.WARNING);
+            return;
+        }
+        if (seleccionado.getId() == usuarioActivo.getId()) {
+            mostrarAlerta("No puedes cambiar tu propio estado.", Alert.AlertType.WARNING);
+            return;
+        }
+        if (seleccionado.getEstado() == Usuario.Estado.ACTIVO) {
+            mostrarAlerta("El usuario ya está activo.", Alert.AlertType.WARNING);
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmar activación");
+        confirm.setHeaderText("¿Activar a " + seleccionado.getUsername() + "?");
+        confirm.setContentText("El usuario podrá acceder al sistema.");
+        confirm.showAndWait().ifPresent(resp -> {
+            if (resp == ButtonType.OK) {
+                try {
+                    usuarioService.cambiarEstado(seleccionado.getId(), Usuario.Estado.ACTIVO, usuarioActivo);
+                    cargarDatos();
+                    mostrarAlerta("Usuario activado correctamente.", Alert.AlertType.INFORMATION);
                 } catch (Exception ex) {
                     mostrarAlerta("Error: " + ex.getMessage(), Alert.AlertType.ERROR);
                 }

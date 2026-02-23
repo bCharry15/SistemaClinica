@@ -185,5 +185,10 @@ public class AuthServiceImplTest {
         public void eliminar(int id) {
             // Fake implementation for testing
         }
+
+        @Override
+        public void actualizarEstado(int id, Usuario.Estado estado) {
+            // Fake implementation for testing
+        }
     }
 }

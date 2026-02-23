@@ -54,4 +54,15 @@ public class UsuarioServiceImpl implements IUsuarioService {
         }
         usuarioRepository.eliminar(id);
     }
+
+    @Override
+    public void cambiarEstado(int id, Usuario.Estado estado, Usuario adminActivo) {
+        if (adminActivo == null || !adminActivo.esAdmin()) {
+            throw new SecurityException("Solo un ADMIN puede cambiar el estado de los usuarios.");
+        }
+        if (id == adminActivo.getId()) {
+            throw new IllegalArgumentException("No puedes cambiar tu propio estado.");
+        }
+        usuarioRepository.actualizarEstado(id, estado);
+    }
 }

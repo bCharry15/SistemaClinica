@@ -15,4 +15,5 @@ public interface IUsuarioService {
     void crear(String username, String password, Usuario.Rol rol, Usuario adminActivo);
     List<Usuario> listarTodos();
     void eliminar(int id, Usuario adminActivo);
+    void cambiarEstado(int id, Usuario.Estado estado, Usuario adminActivo);
 }

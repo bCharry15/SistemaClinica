@@ -18,4 +18,5 @@ public interface IUsuarioRepository {
     boolean existeUsername(String username);
     List<Usuario> obtenerTodos();
     void eliminar(int id);
+    void actualizarEstado(int id, Usuario.Estado estado);
 }

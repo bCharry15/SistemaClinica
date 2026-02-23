@@ -19,3 +19,4 @@ co\edu\unicauca\service\IPacienteService.class
 co\edu\unicauca\service\IAuthService.class
 co\edu\unicauca\service\PacienteServiceImpl.class
 co\edu\unicauca\ui\PacienteView.class
+co\edu\unicauca\model\Usuario$Estado.class

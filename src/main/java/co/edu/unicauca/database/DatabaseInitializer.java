@@ -4,10 +4,6 @@
  */
 package co.edu.unicauca.database;
 
-/**
- *
- * @author jpuen
- */
 import co.edu.unicauca.model.Paciente;
 import co.edu.unicauca.model.Usuario;
 import co.edu.unicauca.service.IPacienteService;
@@ -28,6 +24,7 @@ public class DatabaseInitializer {
 
     public void inicializar() throws SQLException {
         crearTablaUsuarios();
+        migrarAgregarEstadoAUsuarios();
         crearTablaPacientes();
         insertarAdminPorDefecto();
         insertarUsuarioNormalPorDefecto();
@@ -39,10 +36,35 @@ public class DatabaseInitializer {
                 + "id            INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "username      TEXT    NOT NULL UNIQUE,"
                 + "password_hash TEXT    NOT NULL,"
-                + "rol           TEXT    NOT NULL CHECK(rol IN ('ADMIN','USER'))"
+                + "rol           TEXT    NOT NULL CHECK(rol IN ('ADMIN','USER')),"
+                + "estado        TEXT    NOT NULL DEFAULT 'ACTIVO' CHECK(estado IN ('ACTIVO','DESACTIVADO'))"
                 + ");";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(sql);
+        }
+    }
+
+    private void migrarAgregarEstadoAUsuarios() throws SQLException {
+        // Verificar si la columna 'estado' ya existe
+        String checkSql = "PRAGMA table_info(usuarios)";
+        boolean tieneEstado = false;
+        try (Statement stmt = connection.createStatement();
+             java.sql.ResultSet rs = stmt.executeQuery(checkSql)) {
+            while (rs.next()) {
+                String columnName = rs.getString("name");
+                if ("estado".equals(columnName)) {
+                    tieneEstado = true;
+                    break;
+                }
+            }
+        }
+        
+        // Si no existe, agregarla
+        if (!tieneEstado) {
+            String addColumnSql = "ALTER TABLE usuarios ADD COLUMN estado TEXT NOT NULL DEFAULT 'ACTIVO' CHECK(estado IN ('ACTIVO','DESACTIVADO'))";
+            try (Statement stmt = connection.createStatement()) {
+                stmt.execute(addColumnSql);
+            }
         }
     }
 

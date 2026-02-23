@@ -23,11 +23,12 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
 
     @Override
     public void guardar(Usuario u) {
-        String sql = "INSERT INTO usuarios (username, password_hash, rol) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO usuarios (username, password_hash, rol, estado) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = getConn().prepareStatement(sql)) {
             ps.setString(1, u.getUsername());
             ps.setString(2, u.getPasswordHash());
             ps.setString(3, u.getRol().name());
+            ps.setString(4, u.getEstado().name());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error al guardar usuario: " + e.getMessage(), e);
@@ -45,7 +46,8 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
                     rs.getInt("id"),
                     rs.getString("username"),
                     rs.getString("password_hash"),
-                    Usuario.Rol.valueOf(rs.getString("rol"))
+                    Usuario.Rol.valueOf(rs.getString("rol")),
+                    Usuario.Estado.valueOf(rs.getString("estado"))
                 );
                 return Optional.of(u);
             }
@@ -78,7 +80,8 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
                     rs.getInt("id"),
                     rs.getString("username"),
                     rs.getString("password_hash"),
-                    Usuario.Rol.valueOf(rs.getString("rol"))
+                    Usuario.Rol.valueOf(rs.getString("rol")),
+                    Usuario.Estado.valueOf(rs.getString("estado"))
                 );
                 usuarios.add(u);
             }
@@ -96,6 +99,18 @@ public class UsuarioRepositoryImpl implements IUsuarioRepository {
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error al eliminar usuario: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void actualizarEstado(int id, Usuario.Estado estado) {
+        String sql = "UPDATE usuarios SET estado = ? WHERE id = ?";
+        try (PreparedStatement ps = getConn().prepareStatement(sql)) {
+            ps.setString(1, estado.name());
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al actualizar estado del usuario: " + e.getMessage(), e);
         }
     }
 }
