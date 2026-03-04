@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="co.edu.unicauca.piedraazul.controller.RegisterUserController">
+    <children>
+        <VBox spacing="10" alignment="CENTER" layoutX="50" layoutY="50">
+            <children>
+                <Label text="Registrar Usuario" style="-fx-font-size: 24;" />
+                <TextField fx:id="usernameField" promptText="Usuario" />
+                <PasswordField fx:id="passwordField" promptText="Contraseña" />
+                <ChoiceBox fx:id="roleChoice" />
+                <Button text="Registrar" onAction="#register" />
+                <Button text="Volver al Panel" onAction="#goBack" />
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

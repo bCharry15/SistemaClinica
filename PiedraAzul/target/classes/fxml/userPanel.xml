@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="co.edu.unicauca.piedraazul.controller.UserPanelController">
+    <children>
+        <VBox spacing="10" alignment="CENTER" layoutX="50" layoutY="50">
+            <children>
+                <Label text="Panel de Usuario" style="-fx-font-size: 24;" />
+                <Label text="Bienvenido" style="-fx-font-size: 14;" />
+                <Button text="Cerrar Sesión" onAction="#logout" />
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

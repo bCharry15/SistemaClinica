@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.unicauca.piedraazul.controller.AdminPanelController"
+            prefWidth="500" prefHeight="450">
+    <children>
+        <VBox spacing="15" alignment="TOP_CENTER" layoutX="30" layoutY="20" prefWidth="440">
+            <children>
+                <Label text="Panel de Administrador" style="-fx-font-size: 22; -fx-font-weight: bold;" />
+
+                <!-- Formulario de registro inline -->
+                <TitledPane text="Registrar Nuevo Usuario" collapsible="false">
+                    <content>
+                        <VBox spacing="8" style="-fx-padding: 10;">
+                            <TextField fx:id="usernameField" promptText="Usuario" />
+                            <PasswordField fx:id="passwordField" promptText="Contraseña" />
+                            <ChoiceBox fx:id="roleChoice" maxWidth="Infinity" />
+                            <Button text="Registrar" onAction="#register" maxWidth="Infinity" />
+                        </VBox>
+                    </content>
+                </TitledPane>
+
+                <!-- Área de log del Observer -->
+                <TitledPane text="Log de Eventos (Observer)" collapsible="false">
+                    <content>
+                        <TextArea fx:id="logArea"
+                                  editable="false"
+                                  prefHeight="150"
+                                  wrapText="true"
+                                  style="-fx-font-family: monospace; -fx-font-size: 11;" />
+                    </content>
+                </TitledPane>
+
+                <Button text="Cerrar Sesión" onAction="#logout" maxWidth="Infinity"
+                        style="-fx-background-color: #e74c3c; -fx-text-fill: white;" />
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

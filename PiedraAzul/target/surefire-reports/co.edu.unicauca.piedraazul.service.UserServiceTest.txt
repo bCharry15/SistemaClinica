@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: co.edu.unicauca.piedraazul.service.UserServiceTest
+-------------------------------------------------------------------------------
+Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.712 s -- in co.edu.unicauca.piedraazul.service.UserServiceTest

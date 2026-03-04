@@ -1,0 +1,8 @@
+co\edu\unicauca\piedraazul\service\UserServiceTest.class
+co\edu\unicauca\piedraazul\model\UserEnumsTest.class
+co\edu\unicauca\piedraazul\observer\SubjectTest$ConcreteSubject.class
+co\edu\unicauca\piedraazul\model\UserTest.class
+co\edu\unicauca\piedraazul\observer\SubjectTest$RecordingObserver.class
+co\edu\unicauca\piedraazul\model\UserTest$TestObserver.class
+co\edu\unicauca\piedraazul\observer\SubjectTest.class
+co\edu\unicauca\piedraazul\service\UserServiceTest$CapturingObserver.class
